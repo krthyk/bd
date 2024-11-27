@@ -1,0 +1,17 @@
+{
+  "title": "Greetings",
+  "wish": "HAPPY BIRTHDAY! 🎉",
+  "message": "Wishing you a year of laughter, adventures, and great moments! May your days be filled with joy, and your life be as flawless as the perfect piece of code. 🎂 Here's to endless happiness and countless smiles.",
+  "backgroundMusic": "https://example.com/path-to-music.mp3",
+  "images": [
+    "https://i.imgur.com/YHMGg3X.jpeg",
+    "https://favim.com/pd/p/orig/2018/08/15/i-bp-kim-jisoo-blackpink-jisoo-Favim.com-6134790.jpg",
+    "https://favim.com/pd/s11/orig/7/747/7478/74782/jisoo-scan-black-pink-scans-jisoo-Favim.com-7478293.jpg",
+    "https://images6.fanpop.com/image/photos/41400000/Jisoo-jisoo-blackpink-41476977-720-703.jpg",
+    "https://images6.fanpop.com/image/photos/41400000/Jisoo-jisoo-blackpink-41476974-720-710.jpg"
+  ],
+  "credits": {
+    "name": "kxrthyk",
+    "link": "www.instagram.com/kxrthyk"
+  }
+}
