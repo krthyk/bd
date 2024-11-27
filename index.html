@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title> <!-- Dynamically set from config.json -->
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Styles */
+        body {
+            font-family: 'Google Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+        .carousel {
+            position: relative;
+            margin: 20px auto;
+            max-width: 600px;
+            overflow: hidden;
+        }
+        .carousel-images {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+        .carousel-images img {
+            width: 100%;
+            flex-shrink: 0;
+        }
+        .dots {
+            margin-top: 10px;
+        }
+        .dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            margin: 0 5px;
+            background-color: #ccc;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .active-dot {
+            background-color: #333;
+        }
+        .credits {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .credits a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        .footer-buttons {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        .footer-buttons button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .dark-mode {
+            background-color: #121212;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Image Carousel Section -->
+        <div class="carousel">
+            <div class="carousel-images"></div>
+            <div class="dots"></div>
+        </div>
+
+        <!-- Text Section -->
+        <div class="text-container">
+            <h1 id="wish"></h1> <!-- Dynamically set from config.json -->
+            <p id="message"></p> <!-- Dynamically set from config.json -->
+        </div>
+    </div>
+
+    <!-- Credits Section -->
+    <div class="credits">
+        <p>Made with <span>&#10084;</span> by <a id="credits-link" href="#" target="_blank"><span id="credits-name"></span></a></p>
+    </div>
+
+    <!-- Background Music -->
+    <audio id="birthday-song" loop autoplay>
+        <source id="audio-source" src="" type="audio/mp3">
+    </audio>
+
+    <!-- Footer with buttons -->
+    <div class="footer-buttons">
+        <button id="mute-button" class="mute-button">🔊</button>
+        <button id="dark-mode-toggle" class="dark-mode-toggle">🌙</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Fetch JSON data from config.json
+            fetch('config.json')
+                .then(response => response.json())
+                .then(data => {
+                    // Update dynamic content
+                    document.title = data.title; // Set <title> dynamically
+                    document.getElementById('wish').textContent = data.wish; // Set <h1> dynamically
+                    document.getElementById('message').textContent = data.message; // Set <p> dynamically
+
+                    // Update background music
+                    const audioSource = document.getElementById('audio-source');
+                    audioSource.src = data.backgroundMusic;
+                    audioSource.parentElement.load();
+
+                    // Update credits
+                    const creditsLink = document.getElementById('credits-link');
+                    creditsLink.href = `https://${data.credits.link}`;
+                    document.getElementById('credits-name').textContent = data.credits.name;
+
+                    // Load carousel images
+                    const carouselImages = document.querySelector('.carousel-images');
+                    const dotsContainer = document.querySelector('.dots');
+                    data.images.forEach((image, index) => {
+                        const imgElement = document.createElement('img');
+                        imgElement.src = image;
+                        imgElement.alt = `Birthday Image ${index + 1}`;
+                        carouselImages.appendChild(imgElement);
+
+                        const dotElement = document.createElement('span');
+                        dotElement.className = 'dot';
+                        if (index === 0) dotElement.classList.add('active-dot');
+                        dotElement.addEventListener('click', () => {
+                            currentIndex = index;
+                            updateCarousel();
+                        });
+                        dotsContainer.appendChild(dotElement);
+                    });
+
+                    // Initialize carousel
+                    updateCarousel();
+                })
+                .catch(error => console.error("Error loading JSON:", error));
+
+            // Carousel functionality
+            let currentIndex = 0;
+            function updateCarousel() {
+                const carouselImages = document.querySelector('.carousel-images');
+                const dots = document.querySelectorAll('.dot');
+                carouselImages.style.transform = `translateX(-${currentIndex * 100}%)`;
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active-dot', index === currentIndex);
+                });
+            }
+
+            setInterval(() => {
+                const dots = document.querySelectorAll('.dot');
+                currentIndex = (currentIndex + 1) % dots.length;
+                updateCarousel();
+            }, 3000);
+
+            // Dark Mode Toggle
+            const darkModeToggle = document.getElementById('dark-mode-toggle');
+            darkModeToggle.addEventListener('click', () => {
+                const isDarkMode = document.body.classList.toggle('dark-mode');
+                darkModeToggle.textContent = isDarkMode ? '🌞' : '🌙';
+            });
+
+            // Mute Button
+            const muteButton = document.getElementById('mute-button');
+            const audioElement = document.getElementById('birthday-song');
+            muteButton.addEventListener('click', () => {
+                audioElement.muted = !audioElement.muted;
+                muteButton.textContent = audioElement.muted ? '🔇' : '🔊';
+            });
+        });
+    </script>
+</body>
+</html>
