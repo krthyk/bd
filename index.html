@@ -3,101 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title> <!-- Dynamically set from config.json -->
+    <title id="page-title"></title>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans&display=swap" rel="stylesheet">
     <style>
-        /* CSS Styles */
         body {
             font-family: 'Google Sans', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-            color: #333;
-        }
-        .container {
+            background-color: #f9f9f9;
             text-align: center;
-            padding: 20px;
         }
-        .carousel {
+
+        .container {
             position: relative;
-            margin: 20px auto;
-            max-width: 600px;
-            overflow: hidden;
         }
+
+        .carousel {
+            display: flex;
+            overflow: hidden;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+
         .carousel-images {
             display: flex;
-            transition: transform 0.5s ease-in-out;
+            transition: transform 1s ease;
         }
+
         .carousel-images img {
             width: 100%;
-            flex-shrink: 0;
+            height: auto;
         }
-        .dots {
-            margin-top: 10px;
-        }
+
         .dot {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
+            height: 15px;
+            width: 15px;
             margin: 0 5px;
-            background-color: #ccc;
+            background-color: #bbb;
             border-radius: 50%;
-            cursor: pointer;
+            display: inline-block;
+            transition: background-color 0.6s ease;
         }
+
         .active-dot {
-            background-color: #333;
+            background-color: #717171;
         }
+
+        .text-container {
+            padding: 20px;
+        }
+
+        #birthday-title {
+            font-size: 3rem;
+            color: #333;
+        }
+
+        .message {
+            font-size: 1.2rem;
+            color: #666;
+        }
+
         .credits {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .credits a {
-            text-decoration: none;
-            color: #007bff;
-        }
-        .footer-buttons {
             position: fixed;
             bottom: 10px;
-            right: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1rem;
+        }
+
+        .credits a {
+            color: #333;
+            text-decoration: none;
+        }
+
+        audio {
+            display: none;
+        }
+
+        .footer-buttons {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
             display: flex;
             gap: 10px;
         }
-        .footer-buttons button {
-            background: none;
+
+        .mute-button, .dark-mode-toggle {
+            padding: 10px;
             border: none;
-            font-size: 1.5rem;
+            background-color: #f0f0f0;
             cursor: pointer;
         }
+
         .dark-mode {
             background-color: #121212;
-            color: #fff;
+            color: white;
+        }
+
+        .dark-mode .credits a {
+            color: white;
+        }
+
+        .dark-mode .footer-buttons button {
+            background-color: #333;
+            color: white;
         }
     </style>
 </head>
 <body>
 
+    <!-- Container for images and text -->
     <div class="container">
-        <!-- Image Carousel Section -->
         <div class="carousel">
-            <div class="carousel-images"></div>
-            <div class="dots"></div>
+            <div class="carousel-images" id="carousel-images">
+                <!-- Dynamic images will be inserted here -->
+            </div>
+            <div class="dots" id="dots"></div>
         </div>
 
-        <!-- Text Section -->
         <div class="text-container">
-            <h1 id="wish"></h1> <!-- Dynamically set from config.json -->
-            <p id="message"></p> <!-- Dynamically set from config.json -->
+            <h1 id="birthday-title"></h1>
+            <p class="message" id="birthday-message"></p>
         </div>
     </div>
 
     <!-- Credits Section -->
     <div class="credits">
-        <p>Made with <span>&#10084;</span> by <a id="credits-link" href="#" target="_blank"><span id="credits-name"></span></a></p>
+        <p>Made with <span>&#10084;</span> by <a id="credits-link" href="" target="_blank"></a></p>
     </div>
 
     <!-- Background Music -->
     <audio id="birthday-song" loop autoplay>
-        <source id="audio-source" src="" type="audio/mp3">
+        <source id="music-source" src="" type="audio/mp3">
     </audio>
 
     <!-- Footer with buttons -->
@@ -107,82 +143,73 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // Fetch JSON data from config.json
-            fetch('config.json')
-                .then(response => response.json())
-                .then(data => {
-                    // Update dynamic content
-                    document.title = data.title; // Set <title> dynamically
-                    document.getElementById('wish').textContent = data.wish; // Set <h1> dynamically
-                    document.getElementById('message').textContent = data.message; // Set <p> dynamically
+        // Fetching the data from the JSON file
+        fetch('data.json')
+            .then(response => response.json())
+            .then(data => {
+                // Set title from JSON
+                document.getElementById('page-title').innerText = data.title;
 
-                    // Update background music
-                    const audioSource = document.getElementById('audio-source');
-                    audioSource.src = data.backgroundMusic;
-                    audioSource.parentElement.load();
+                // Update the page content dynamically
+                document.getElementById('birthday-title').innerText = data.wish;
+                document.getElementById('birthday-message').innerText = data.message;
 
-                    // Update credits
-                    const creditsLink = document.getElementById('credits-link');
-                    creditsLink.href = `https://${data.credits.link}`;
-                    document.getElementById('credits-name').textContent = data.credits.name;
+                // Set background music source
+                document.getElementById('music-source').src = data.backgroundMusic;
 
-                    // Load carousel images
-                    const carouselImages = document.querySelector('.carousel-images');
-                    const dotsContainer = document.querySelector('.dots');
-                    data.images.forEach((image, index) => {
-                        const imgElement = document.createElement('img');
-                        imgElement.src = image;
-                        imgElement.alt = `Birthday Image ${index + 1}`;
-                        carouselImages.appendChild(imgElement);
+                // Insert images dynamically into the carousel
+                const carouselImagesContainer = document.getElementById('carousel-images');
+                const dotsContainer = document.getElementById('dots');
+                data.images.forEach((imageSrc, index) => {
+                    // Create image elements for carousel
+                    const img = document.createElement('img');
+                    img.src = imageSrc;
+                    img.alt = `Image ${index + 1}`;
+                    carouselImagesContainer.appendChild(img);
 
-                        const dotElement = document.createElement('span');
-                        dotElement.className = 'dot';
-                        if (index === 0) dotElement.classList.add('active-dot');
-                        dotElement.addEventListener('click', () => {
-                            currentIndex = index;
-                            updateCarousel();
-                        });
-                        dotsContainer.appendChild(dotElement);
-                    });
-
-                    // Initialize carousel
-                    updateCarousel();
-                })
-                .catch(error => console.error("Error loading JSON:", error));
-
-            // Carousel functionality
-            let currentIndex = 0;
-            function updateCarousel() {
-                const carouselImages = document.querySelector('.carousel-images');
-                const dots = document.querySelectorAll('.dot');
-                carouselImages.style.transform = `translateX(-${currentIndex * 100}%)`;
-                dots.forEach((dot, index) => {
-                    dot.classList.toggle('active-dot', index === currentIndex);
+                    // Create a dot for each image
+                    const dot = document.createElement('span');
+                    dot.classList.add('dot');
+                    if (index === 0) dot.classList.add('active-dot'); // Highlight first dot
+                    dotsContainer.appendChild(dot);
                 });
-            }
 
-            setInterval(() => {
-                const dots = document.querySelectorAll('.dot');
-                currentIndex = (currentIndex + 1) % dots.length;
-                updateCarousel();
-            }, 3000);
+                // Update credits dynamically
+                document.getElementById('credits-link').href = `https://${data.credits.link}`;
+                document.getElementById('credits-link').innerText = data.credits.name;
 
-            // Dark Mode Toggle
-            const darkModeToggle = document.getElementById('dark-mode-toggle');
-            darkModeToggle.addEventListener('click', () => {
-                const isDarkMode = document.body.classList.toggle('dark-mode');
-                darkModeToggle.textContent = isDarkMode ? '🌞' : '🌙';
-            });
+                // Carousel functionality
+                let currentIndex = 0;
 
-            // Mute Button
-            const muteButton = document.getElementById('mute-button');
-            const audioElement = document.getElementById('birthday-song');
-            muteButton.addEventListener('click', () => {
-                audioElement.muted = !audioElement.muted;
-                muteButton.textContent = audioElement.muted ? '🔇' : '🔊';
-            });
-        });
+                function updateCarousel() {
+                    carouselImagesContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
+                    const dots = document.querySelectorAll('.dot');
+                    dots.forEach((dot, idx) => {
+                        dot.classList.remove('active-dot');
+                        if (idx === currentIndex) {
+                            dot.classList.add('active-dot');
+                        }
+                    });
+                }
+
+                setInterval(() => {
+                    currentIndex = (currentIndex + 1) % data.images.length;
+                    updateCarousel();
+                }, 1500);
+
+                // Mute button functionality
+                const audio = document.getElementById('birthday-song');
+                document.getElementById('mute-button').addEventListener('click', function() {
+                    audio.muted = !audio.muted;
+                    this.textContent = audio.muted ? '🔈' : '🔊';
+                });
+
+                // Dark Mode toggle functionality
+                document.getElementById('dark-mode-toggle').addEventListener('click', function() {
+                    document.body.classList.toggle('dark-mode');
+                });
+            })
+            .catch(error => console.error('Error loading JSON:', error));
     </script>
 </body>
 </html>
